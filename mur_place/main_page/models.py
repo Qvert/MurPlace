@@ -1,16 +1,16 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    email = models.CharField(max_length=254, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f'Profile of {self.user.username}'
+# class Profile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     date_of_birth = models.DateField(blank=True, null=True)
+#     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     def __str__(self):
+#         return f'Profile of {self.user.username}'
 
 
 """Данные для регистрации:
@@ -21,3 +21,13 @@ class Profile(models.Model):
     date_of_join
     
 """
+
+
+class Profile(AbstractUser):
+    date_of_birth = models.DateField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.username
