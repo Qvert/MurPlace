@@ -1,43 +1,34 @@
-from django.contrib.auth import authenticate, login as user_login
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
 
-from .models import Profile
+from .forms import SignUpForm, LoginForm
 
 
 def index(request):
     return render(request, "main_page/index.html")
 
 
-def auth_view(request):
+def signup_view(request):
     if request.method == 'POST':
-        login = request.POST.get('login')
-        password = request.POST.get('password')
-
-        usr = authenticate(request, login, password)
-        if usr is not None:
-            user_login(request, usr)
-            return HttpResponseRedirect('/')
-        else:
-            return render(request, "auth_page/auth.html")
-
-    return render(request, "auth_page/auth.html")
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # Сохраняем нового пользователя
+            login(request, user)  # Выполняем вход
+            return redirect('')  # Перенаправляем на главную страницу
+    else:
+        form = SignUpForm()
+    return render(request, 'auth_page/signup.html', {'form': form})
 
 
-def reg_view(request):
+def login_view(request):
+    form = LoginForm(data=request.POST or None)
     if request.method == 'POST':
-        login = request.POST.get('login')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
-
-        if password == password2:
-
-            Profile.objects.create_user(login, password)
-
-            usr = authenticate(request, login, password)
-            if usr is not None:
-                user_login(request, usr)
-                return HttpResponseRedirect('/')
-            else:
-                return render(request, "auth_page/reg.html")
-    return render(request, "auth_page/reg.html")
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username,
+                                password=password)  # Проверяем учетные данные
+            if user is not None:
+                login(request, user)  # Выполняем вход
+                return redirect('')  # Перенаправляем на главную страницу
+    return render(request, 'auth_page/login.html', {'form': form})

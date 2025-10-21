@@ -3,10 +3,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Муркетплейс</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
@@ -45,7 +41,50 @@
 
                 <!-- Card Body -->
                 <div class="p-6">
-                    <form id="registerForm">
+                    <form id="SignUpForm">
+                        {% csrf_token %}
+                        <!-- Username Field -->
+                        <div class="mb-4">
+                            <label for="username" class="block text-gray-700 text-sm font-medium mb-2">
+                                Username
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    class="w-full py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="Choose a username"
+                                    required
+                                    minlength="3"
+                                >
+                                <div class="absolute right-3 top-3.5 text-gray-400">
+                                    <i data-feather="user"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Must be at least 3 characters long</p>
+                        </div>
+
+                        <!-- First Name Field -->
+                        <div class="mb-4">
+                            <label for="first_name" class="block text-gray-700 text-sm font-medium mb-2">
+                                First Name
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    id="first_name"
+                                    name="first_name"
+                                    class="w-full py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="Your first name"
+                                    required
+                                >
+                                <div class="absolute right-3 top-3.5 text-gray-400">
+                                    <i data-feather="user"></i>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Email Field -->
                         <div class="mb-4">
                             <label for="email" class="block text-gray-700 text-sm font-medium mb-2">
@@ -63,7 +102,6 @@
                                 <div class="absolute right-3 top-3.5 text-gray-400">
                                     <i data-feather="mail"></i>
                                 </div>
-                                {% csrf_token %}
                             </div>
                         </div>
 
@@ -80,14 +118,13 @@
                                     class="w-full py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                                     placeholder="Create a password"
                                     required
-                                    minlength="6"
+                                    minlength="8"
                                 >
                                 <div class="absolute right-3 top-3.5 text-gray-400">
                                     <i data-feather="lock"></i>
                                 </div>
                             </div>
                             <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters long</p>
-                            {% csrf_token %}
                         </div>
 
                         <!-- Confirm Password Field -->
@@ -111,7 +148,6 @@
                             <div id="passwordMatch" class="text-xs mt-1 hidden">
                                 <span class="text-red-500">Passwords do not match</span>
                             </div>
-                            {% csrf_token %}
                         </div>
 
                         <!-- Terms and Conditions -->
@@ -208,7 +244,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-6 text-center">
-                <p>&copy; 2023 Муркетплейс. All rights reserved.</p>
+                <p>&copy; 2025 Муркетплейс. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -218,17 +254,27 @@
         AOS.init();
         feather.replace();
 
-        // Password validation
+        // Form validation
+        const username = document.getElementById('username');
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirmPassword');
         const passwordMatch = document.getElementById('passwordMatch');
         const submitBtn = document.getElementById('submitBtn');
         const termsCheckbox = document.getElementById('terms');
+        const first_name = document.getElementById('first_name');
+        const email = document.getElementById('email');
 
-        function validatePasswords() {
+        function validateForm() {
+            const usernameValid = username.value.length >= 3;
             const passwordsMatch = password.value === confirmPassword.value;
-            const isValid = passwordsMatch && password.value.length >= 8 && termsCheckbox.checked;
+            const passwordValid = password.value.length >= 8;
+            const termsAccepted = termsCheckbox.checked;
+            const firstNameValid = first_name.value.trim().length > 0;
+            const emailValid = email.value.includes('@') && email.value.includes('.');
 
+            const isValid = usernameValid && passwordsMatch && passwordValid && termsAccepted && firstNameValid && emailValid;
+
+            // Password match validation
             if (confirmPassword.value) {
                 if (passwordsMatch) {
                     passwordMatch.classList.add('hidden');
@@ -244,16 +290,58 @@
                 confirmPassword.classList.remove('border-red-300', 'border-green-300');
             }
 
+            // Username validation styling
+            if (username.value) {
+                if (usernameValid) {
+                    username.classList.remove('border-red-300');
+                    username.classList.add('border-green-300');
+                } else {
+                    username.classList.add('border-red-300');
+                    username.classList.remove('border-green-300');
+                }
+            }
+
+            // First name validation styling
+            if (first_name.value) {
+                if (firstNameValid) {
+                    first_name.classList.remove('border-red-300');
+                    first_name.classList.add('border-green-300');
+                } else {
+                    first_name.classList.add('border-red-300');
+                    first_name.classList.remove('border-green-300');
+                }
+            }
+
+            // Email validation styling
+            if (email.value) {
+                if (emailValid) {
+                    email.classList.remove('border-red-300');
+                    email.classList.add('border-green-300');
+                } else {
+                    email.classList.add('border-red-300');
+                    email.classList.remove('border-green-300');
+                }
+            }
+
             submitBtn.disabled = !isValid;
         }
 
-        password.addEventListener('input', validatePasswords);
-        confirmPassword.addEventListener('input', validatePasswords);
-        termsCheckbox.addEventListener('change', validatePasswords);
+        // Event listeners for real-time validation
+        username.addEventListener('input', validateForm);
+        first_name.addEventListener('input', validateForm);
+        email.addEventListener('input', validateForm);
+        password.addEventListener('input', validateForm);
+        confirmPassword.addEventListener('input', validateForm);
+        termsCheckbox.addEventListener('change', validateForm);
 
         // Form submission handler
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            if (!validateForm()) {
+                alert('Please fill in all fields correctly.');
+                return;
+            }
 
             if (password.value !== confirmPassword.value) {
                 alert('Passwords do not match. Please check your input.');
@@ -264,15 +352,38 @@
                 alert('Please agree to the Terms of Service and Privacy Policy.');
                 return;
             }
+
+            // Here you would typically send the data to your Django backend
+            const formData = {
+                username: username.value,
+                first_name: first_name.value,
+                email: email.value,
+                password: password.value
+            };
+            
+            // For actual implementation, you would use fetch() to send data to your Django view
+            /*
+            fetch('/api/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Registration failed: ' + data.error);
+                }
+            });
+            */
         });
 
         // Initial validation
-        validatePasswords();
+        validateForm();
     </script>
-</body>
-</html></title>
-</head>
-<body>
-
 </body>
 </html>
